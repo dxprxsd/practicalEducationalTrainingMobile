@@ -1,6 +1,6 @@
 # Aphex - Мобильное приложение для парикмахерской 
 
-![Icon](chicchicProgForHaircuts/Materials/Icon/aphexlogobarber.png)
+![Icon](materials/Icon/AphexLogoNew.png)
 
 Приложение "Aphex" позволяет пользователям записываться на стрижку, выбирать парикмахеров и стрижки, а также управлять временем записи.
 
