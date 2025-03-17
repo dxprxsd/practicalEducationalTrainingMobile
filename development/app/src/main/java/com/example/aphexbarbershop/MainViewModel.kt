@@ -1,13 +1,16 @@
 package com.example.aphexbarbershop
 
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.aphexbarbershop.Domain.Constants
+import com.example.aphexbarbershop.Models.Haircut
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.providers.builtin.Email
+import io.github.jan.supabase.postgrest.from
 //import io.github.jan.supabase.gotrue.auth
 //import io.github.jan.supabase.gotrue.providers.builtin.Email
 import kotlinx.coroutines.launch
@@ -22,6 +25,9 @@ class MainViewModel : ViewModel()  {
 
     //private val _user = mutableStateOf(listOf<users>())
     //val user: State<List<users>> = _user
+
+    private val _rmhaircuts = mutableStateOf(listOf<Haircut>())
+    val haircuts: State<List<Haircut>> = _rmhaircuts
 
     //Функция для входа в приложении
     fun onSignInEmailPassword(emailUser: String, passwordUser: String) {
@@ -44,6 +50,23 @@ class MainViewModel : ViewModel()  {
                 println("Error")
                 authResult.value = "Error" // Устанавливаем ошибочный результат
                 println(e.message.toString())
+            }
+        }
+    }
+
+    //тоже для поиска
+    fun fetchHaircuts() {
+        // Запрос к базе данных (например, Supabase)
+        viewModelScope.launch {
+            try{
+                val fetchedClothes = Constants.supabase.from("haircuts")
+                    .select()
+                    .decodeList<Haircut>()
+
+                _rmhaircuts.value = fetchedClothes
+                //filteredClothess() //применить фильтрацию
+            } catch (e: Exception) {
+                Log.e("MainViewModel", "Ошибка загрузки одежды: ${e.message}")
             }
         }
     }
