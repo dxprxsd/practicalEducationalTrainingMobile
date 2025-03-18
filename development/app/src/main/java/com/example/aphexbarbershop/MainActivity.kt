@@ -18,6 +18,9 @@ import com.example.aphexbarbershop.Screens.LoadScreen
 import com.example.aphexbarbershop.Screens.LoginScreen
 import com.example.aphexbarbershop.Screens.LoginScreenPreview
 import com.example.aphexbarbershop.Screens.MainScreen
+import com.example.aphexbarbershop.Screens.RegistrationScreen
+import com.example.aphexbarbershop.Screens.RegistrationScreenEmailPassword
+import com.example.aphexbarbershop.Screens.RegistrationScreenEmailPasswordScreenPreview
 import com.example.aphexbarbershop.ui.theme.AphexBarbershopTheme
 
 class MainActivity : ComponentActivity() {
@@ -41,6 +44,12 @@ class MainActivity : ComponentActivity() {
                     }
                     composable("main_screen") {
                         MainScreen(navController = navController, MainViewModel = MainViewModel())
+                    }
+                    composable("registration_screen") {
+                        RegistrationScreenEmailPassword(navController = navController, MainViewModel = MainViewModel())
+                    }
+                    composable("registration_second_screen") {
+                        RegistrationScreen(navController = navController, MainViewModel = MainViewModel())
                     }
                 }
             }

@@ -168,151 +168,156 @@ fun MainScreen(navController: NavHostController, MainViewModel: MainViewModel) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
-            modifier = Modifier
-                .fillMaxSize()
-                .weight(1f),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            items(haircuts) { haircut ->
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(180.dp),
-                    shape = RoundedCornerShape(12.dp),
-                ) {
-                    Column(
-                        modifier = Modifier.padding(8.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
+        if (haircuts.isEmpty()) {
+            CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+        } else {
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .weight(1f),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                items(haircuts) { haircut ->
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(180.dp),
+                        shape = RoundedCornerShape(12.dp),
                     ) {
-                        val photoUrl = rememberAsyncImagePainter(
-                            model = ImageRequest.Builder(LocalContext.current).data(haircut.photo)
-                                .size(450, 450).build()
-                        ).state
+                        Column(
+                            modifier = Modifier.padding(8.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            val photoUrl = rememberAsyncImagePainter(
+                                model = ImageRequest.Builder(LocalContext.current)
+                                    .data(haircut.photo)
+                                    .size(450, 450).build()
+                            ).state
 
-                        if (photoUrl is AsyncImagePainter.State.Success) {
-                            Image(
-                                painter = photoUrl.painter!!,
-                                contentDescription = null,
-                                modifier = Modifier
-                                    .height(100.dp)
-                                    .clip(RoundedCornerShape(8.dp))
-                            )
-                        }
-                        if (photoUrl is AsyncImagePainter.State.Loading) {
-                            Box(
-                                modifier = Modifier
-                                    .size(120.dp)
-                                    .clip(CircleShape)
-                                    .background(Color.Gray),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                CircularProgressIndicator()
-                            }
-                        }
-                        if (photoUrl is AsyncImagePainter.State.Error) {
-                            Box(
-                                modifier = Modifier
-                                    .size(50.dp)
-                                    .clip(CircleShape)
-                                    .background(Color.Gray),
-                                contentAlignment = Alignment.Center
-                            ) {
+                            if (photoUrl is AsyncImagePainter.State.Success) {
                                 Image(
-                                    painter = painterResource(R.drawable.aphexlogobarber),
-                                    contentDescription = "Fallback Image",
-                                    modifier = Modifier.size(50.dp)
+                                    painter = photoUrl.painter!!,
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .height(100.dp)
+                                        .clip(RoundedCornerShape(8.dp))
                                 )
                             }
-                        }
+                            if (photoUrl is AsyncImagePainter.State.Loading) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(120.dp)
+                                        .clip(CircleShape)
+                                        .background(Color.Gray),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    CircularProgressIndicator()
+                                }
+                            }
+                            if (photoUrl is AsyncImagePainter.State.Error) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(50.dp)
+                                        .clip(CircleShape)
+                                        .background(Color.Gray),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Image(
+                                        painter = painterResource(R.drawable.aphexlogobarber),
+                                        contentDescription = "Fallback Image",
+                                        modifier = Modifier.size(50.dp)
+                                    )
+                                }
+                            }
 
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(text = haircut.name, fontWeight = FontWeight.Bold)
-                        //Text(text = haircut.gender.toString(), fontSize = 12.sp, color = Color.Gray)
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(text = "${haircut.price} ₽", fontWeight = FontWeight.Bold)
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(text = haircut.name, fontWeight = FontWeight.Bold)
+                            //Text(text = haircut.gender.toString(), fontSize = 12.sp, color = Color.Gray)
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(text = "${haircut.price} ₽", fontWeight = FontWeight.Bold)
+                        }
                     }
                 }
             }
-        }
 
-        // Navigation panel
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(
-                    color = Color.White,
-                    shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
-                )
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            IconButton(
-                onClick = { /*todo*/ },
+            // Navigation panel
+            Row(
                 modifier = Modifier
-                    .size(64.dp) // Увеличение размера кнопки
+                    .fillMaxWidth()
                     .background(
-                        color = Color(0xFF99D77D).copy(alpha = 0.5f),
-                        shape = RoundedCornerShape(10.dp) // Закругление углов
+                        color = Color.White,
+                        shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
                     )
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                Box(
-                    contentAlignment = Alignment.Center,
+                IconButton(
+                    onClick = { /*todo*/ },
                     modifier = Modifier
-                        .size(64.dp)
+                        .size(64.dp) // Увеличение размера кнопки
+                        .background(
+                            color = Color(0xFF99D77D).copy(alpha = 0.5f),
+                            shape = RoundedCornerShape(10.dp) // Закругление углов
+                        )
                 ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.home),
-                        contentDescription = "Go to Main",
-                        tint = Color(0xFFFFFFFF), // Цвет иконки
-                        modifier = Modifier.size(39.dp) // Увеличение размера иконки (при желании)
-                    )
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier
+                            .size(64.dp)
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.home),
+                            contentDescription = "Go to Main",
+                            tint = Color(0xFFFFFFFF), // Цвет иконки
+                            modifier = Modifier.size(39.dp) // Увеличение размера иконки (при желании)
+                        )
+                    }
                 }
-            }
-            IconButton(
-                onClick = { /*todo*/ },
-                modifier = Modifier
-                    .size(64.dp) // Увеличение размера кнопки
-                    .background(
-                        color = Color(0xFF99D77D).copy(alpha = 0.5f),
-                        shape = RoundedCornerShape(10.dp) // Закругление углов
-                    )
-            ) {
-                Box(
-                    contentAlignment = Alignment.Center,
+                IconButton(
+                    onClick = { /*todo*/ },
                     modifier = Modifier
-                        .size(64.dp)
+                        .size(64.dp) // Увеличение размера кнопки
+                        .background(
+                            color = Color(0xFF99D77D).copy(alpha = 0.5f),
+                            shape = RoundedCornerShape(10.dp) // Закругление углов
+                        )
                 ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.add),
-                        contentDescription = "Go to Main",
-                        tint = Color(0xFFFFFFFF), // Цвет иконки
-                        modifier = Modifier.size(39.dp) // Увеличение размера иконки (при желании)
-                    )
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier
+                            .size(64.dp)
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.add),
+                            contentDescription = "Go to Main",
+                            tint = Color(0xFFFFFFFF), // Цвет иконки
+                            modifier = Modifier.size(39.dp) // Увеличение размера иконки (при желании)
+                        )
+                    }
                 }
-            }
-            IconButton(
-                onClick = { /*todo*/ },
-                modifier = Modifier
-                    .size(64.dp) // Увеличение размера кнопки
-                    .background(
-                        color = Color(0xFF99D77D).copy(alpha = 0.5f),
-                        shape = RoundedCornerShape(10.dp) // Закругление углов
-                    )
-            ) {
-                Box(
-                    contentAlignment = Alignment.Center,
+                IconButton(
+                    onClick = { /*todo*/ },
                     modifier = Modifier
-                        .size(64.dp)
+                        .size(64.dp) // Увеличение размера кнопки
+                        .background(
+                            color = Color(0xFF99D77D).copy(alpha = 0.5f),
+                            shape = RoundedCornerShape(10.dp) // Закругление углов
+                        )
                 ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.userprofile),
-                        contentDescription = "Go to Main",
-                        tint = Color(0xFFFFFFFF), // Цвет иконки
-                        modifier = Modifier.size(39.dp) // Увеличение размера иконки (при желании)
-                    )
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier
+                            .size(64.dp)
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.userprofile),
+                            contentDescription = "Go to Main",
+                            tint = Color(0xFFFFFFFF), // Цвет иконки
+                            modifier = Modifier.size(39.dp) // Увеличение размера иконки (при желании)
+                        )
+                    }
                 }
             }
         }

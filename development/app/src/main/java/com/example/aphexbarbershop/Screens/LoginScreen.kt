@@ -122,10 +122,10 @@ fun LoginScreen(navController: NavHostController, MainViewModel: MainViewModel) 
                 // Текст-кнопка "Забыли пароль?"
                 Text(
                     text = "Зарегистрироваться в системе",
-                    fontSize = 14.sp,
+                    fontSize = 16.sp,
                     color = Color.Gray,
                     modifier = Modifier.clickable {
-                        // TODO: Добавить логику перехода на страницу регистрации
+                        navController.navigate("registration_screen")
                     }
                 )
 

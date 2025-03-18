@@ -15,6 +15,5 @@ object Constants {
     ) {
         install(Auth)
         install(Postgrest)
-        install(Storage)
     }
 }
