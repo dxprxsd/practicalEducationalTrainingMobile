@@ -10,5 +10,5 @@ data class Haircut(
     @SerialName("name") val name: String, // Название стрижки
     @SerialName("gender") val gender: Int, // Пол стрижки
     @SerialName("price") val price: Float, // Цена
-    @SerialName("photo") val photo: String? // Фото
+    @SerialName("photo") val photo: String? = null, // Фото
 )

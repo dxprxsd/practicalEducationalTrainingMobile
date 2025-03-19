@@ -2,34 +2,37 @@ package com.example.aphexbarbershop.Screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsEndWidth
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.minimumInteractiveComponentSize
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -40,6 +43,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -55,20 +59,32 @@ import com.example.aphexbarbershop.MainViewModel
 import com.example.aphexbarbershop.Models.Haircut
 import com.example.aphexbarbershop.R
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(navController: NavHostController, MainViewModel: MainViewModel) {
+fun MainScreen(navController: NavHostController, viewModel: MainViewModel) {
     // Observe the haircuts list
-    val haircuts by MainViewModel.haircuts
+    val haircuts by viewModel.haircuts
+
+    //var haircuties by remember { mutableStateOf<List<Haircut>>(listOf()) }
+
+    //для поиска
+    val searchQuery = viewModel.searchQuery
+    val filteredHaircutss by viewModel.filteredHaircuts
+
+    //для фильтрации по выбранному пункту
+    var expanded by remember { mutableStateOf(false) }
+    val list = listOf("Все прически", "Мужские", "Женские")
+    var selectedItem by remember { mutableStateOf("") }
 
     // Load haircuts when the screen is launched
     LaunchedEffect(Unit) {
-        MainViewModel.fetchHaircuts()
+        viewModel.fetchHaircuts()
     }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFF5F5F5)), // Light background
+            .background(Color(0xFF565656)), // Light background
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // Header with logo and menu icon
@@ -93,33 +109,94 @@ fun MainScreen(navController: NavHostController, MainViewModel: MainViewModel) {
         // Search field
         Row(
             modifier = Modifier
-                .width(340.dp)
-                .background(Color(0xFF98E58C), RoundedCornerShape(12.dp))
-                .padding(12.dp),
+                .width(360.dp)
+                .background(Color(0xFF99D77D), RoundedCornerShape(12.dp))
+                .padding(horizontal = 16.dp, vertical = 8.dp),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(
-                imageVector = Icons.Default.Search,
-                contentDescription = "Search",
-                tint = Color.White,
-                modifier = Modifier.size(24.dp)
+
+            // Поисковое поле
+            TextField(
+                value = viewModel.searchQuery.value,
+                onValueChange = { newText ->
+                    viewModel.searchQuery.value = newText
+                    viewModel.filteredHaircutMethod() // Применение фильтрации
+                },
+                placeholder = { Text(text = "Поиск") },
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(start = 8.dp), // Отступ от кнопки фильтра
+                singleLine = true,
+                shape = RoundedCornerShape(8.dp),
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    unfocusedBorderColor = Color(0xFF99D77D), // Границы цвета 99D77D
+                    focusedBorderColor = Color(0xFF99D77D)
+                )
             )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = "Поиск",
-                color = Color.White,
-                fontSize = 16.sp
-            )
+
+            Spacer(modifier = Modifier.width(10.dp))
+
+            // Кнопка для открытия меню
+            Button(
+                onClick = { expanded = !expanded },
+                modifier = Modifier
+                    .width(120.dp)
+                    .height(50.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF565656)), // Новый цвет
+                shape = RoundedCornerShape(12.dp),
+                contentPadding = PaddingValues(0.dp) // Убираем padding, если он был
+            ) {
+                Text(text = selectedItem)
+            }
+
+            // Меню для выбора типов
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+                modifier = Modifier.width(200.dp)
+            ) {
+                list.forEach { label ->
+                    DropdownMenuItem(
+                        text = {
+                            Text(
+                                text = label,
+                                fontSize = 15.sp,
+                                fontWeight = FontWeight.Normal
+                            )
+                        },
+                        onClick = {
+                            selectedItem = label
+                            // В зависимости от выбранного типа аркана, кладем в view model соответствующий Id
+                            when (selectedItem) {
+                                "Все прически" -> {
+                                    viewModel.typeOfReadyClothes = null
+                                }
+                                "Мужские" -> {
+                                    viewModel.typeOfReadyClothes = 1
+                                }
+                                "Женские" -> {
+                                    viewModel.typeOfReadyClothes = 2
+                                }
+                            }
+                            // Вызываем метод для фильтрации карт
+                            viewModel.filteredHaircutMethod()
+                            expanded = false
+                        }
+                    )
+                }
+            }
         }
+
 
         Spacer(modifier = Modifier.height(16.dp))
 
         // Discount information block
         Box(
             modifier = Modifier
-                .width(340.dp)
-                .background(Color(0xFF98E58C), RoundedCornerShape(12.dp))
+                .width(320.dp)
+                .height(90.dp)
+                .background(Color(0xFF99D77D), RoundedCornerShape(12.dp))
                 .padding(16.dp)
         ) {
             Column {
@@ -144,185 +221,168 @@ fun MainScreen(navController: NavHostController, MainViewModel: MainViewModel) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Row(
-            modifier = Modifier.width(340.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
+        // Обернем LazyVerticalGrid в Box для отображения индикатора загрузки
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .weight(1f)
+                .background(Color(0xFFE8E8E8), shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)),
         ) {
-            listOf("Все прически", "Мужские", "Женские").forEach { category ->
-                Box(
+            if (haircuts.isEmpty()) {
+                CircularProgressIndicator(
                     modifier = Modifier
-                        .background(
-                            if (category == "Все прически") Color(0xFF98E58C) else Color.LightGray,
-                            RoundedCornerShape(8.dp)
-                        )
-                        .padding(horizontal = 12.dp, vertical = 6.dp)
+                        .align(Alignment.Center)
+                        .size(48.dp)
+                )
+            } else {
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    Text(
-                        text = category,
-                        color = if (category == "Все прически") Color.White else Color.Black,
-                        fontSize = 14.sp
-                    )
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        if (haircuts.isEmpty()) {
-            CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
-        } else {
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
-                modifier = Modifier
-                    .fillMaxSize()
-                    .weight(1f),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                items(haircuts) { haircut ->
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(180.dp),
-                        shape = RoundedCornerShape(12.dp),
-                    ) {
-                        Column(
-                            modifier = Modifier.padding(8.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
+                    items(filteredHaircutss, key = { it.id }) { haircut ->
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(240.dp),
+                            shape = RoundedCornerShape(12.dp),
                         ) {
-                            val photoUrl = rememberAsyncImagePainter(
-                                model = ImageRequest.Builder(LocalContext.current)
-                                    .data(haircut.photo)
-                                    .size(450, 450).build()
-                            ).state
+                            Column(
+                                modifier = Modifier.padding(8.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                val photoUrl = rememberAsyncImagePainter(
+                                    model = ImageRequest.Builder(LocalContext.current)
+                                        .data(haircut.photo)
+                                        .size(450, 450).build()
+                                ).state
 
-                            if (photoUrl is AsyncImagePainter.State.Success) {
-                                Image(
-                                    painter = photoUrl.painter!!,
-                                    contentDescription = null,
-                                    modifier = Modifier
-                                        .height(100.dp)
-                                        .clip(RoundedCornerShape(8.dp))
-                                )
-                            }
-                            if (photoUrl is AsyncImagePainter.State.Loading) {
                                 Box(
                                     modifier = Modifier
-                                        .size(120.dp)
-                                        .clip(CircleShape)
-                                        .background(Color.Gray),
-                                    contentAlignment = Alignment.Center
+                                        .fillMaxWidth()
+                                        .height(160.dp)
+                                        .border(
+                                            2.dp,
+                                            Color(0xFF98E58C),
+                                            RoundedCornerShape(8.dp)
+                                        ) // Обводка
+                                        .padding(4.dp), // Отступ между границей и изображением
+                                    contentAlignment = Alignment.Center // Центрируем изображение
                                 ) {
-                                    CircularProgressIndicator()
+                                    if (photoUrl is AsyncImagePainter.State.Success) {
+                                        Image(
+                                            painter = photoUrl.painter!!,
+                                            contentDescription = null,
+                                            modifier = Modifier
+                                                .fillMaxSize() // Уменьшаем высоту, чтобы учесть обводку
+                                                .clip(RoundedCornerShape(8.dp)), // Закругляем углы
+                                            contentScale = ContentScale.Crop // Обрезает изображение, чтобы оно вписывалось
+                                        )
+                                    } else if (photoUrl is AsyncImagePainter.State.Loading) {
+                                        CircularProgressIndicator(modifier = Modifier.size(40.dp))
+                                    } else {
+                                        Image(
+                                            painter = painterResource(R.drawable.aphexlogobarber),
+                                            contentDescription = "Fallback Image",
+                                            modifier = Modifier.size(50.dp)
+                                        )
+                                    }
                                 }
-                            }
-                            if (photoUrl is AsyncImagePainter.State.Error) {
-                                Box(
-                                    modifier = Modifier
-                                        .size(50.dp)
-                                        .clip(CircleShape)
-                                        .background(Color.Gray),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Image(
-                                        painter = painterResource(R.drawable.aphexlogobarber),
-                                        contentDescription = "Fallback Image",
-                                        modifier = Modifier.size(50.dp)
-                                    )
-                                }
-                            }
 
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Text(text = haircut.name, fontWeight = FontWeight.Bold)
-                            //Text(text = haircut.gender.toString(), fontSize = 12.sp, color = Color.Gray)
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Text(text = "${haircut.price} ₽", fontWeight = FontWeight.Bold)
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text(text = haircut.name, fontWeight = FontWeight.Bold)
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Text(text = "${haircut.price} ₽", fontWeight = FontWeight.Bold)
+                            }
                         }
                     }
                 }
             }
+        }
 
-            // Navigation panel
-            Row(
+        // Navigation panel
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(
+                    color = Color.White
+                )
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            IconButton(
+                onClick = { navController.navigate("main_screen") },
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .size(64.dp) // Увеличение размера кнопки
                     .background(
-                        color = Color.White,
-                        shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
+                        color = Color(0xFF99D77D),
+                        shape = RoundedCornerShape(10.dp) // Закругление углов
                     )
-                    .padding(16.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                IconButton(
-                    onClick = { /*todo*/ },
+                Box(
+                    contentAlignment = Alignment.Center,
                     modifier = Modifier
-                        .size(64.dp) // Увеличение размера кнопки
-                        .background(
-                            color = Color(0xFF99D77D).copy(alpha = 0.5f),
-                            shape = RoundedCornerShape(10.dp) // Закругление углов
-                        )
+                        .size(64.dp)
                 ) {
-                    Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier
-                            .size(64.dp)
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.home),
-                            contentDescription = "Go to Main",
-                            tint = Color(0xFFFFFFFF), // Цвет иконки
-                            modifier = Modifier.size(39.dp) // Увеличение размера иконки (при желании)
-                        )
-                    }
+                    Icon(
+                        painter = painterResource(id = R.drawable.home),
+                        contentDescription = "Go to Main",
+                        tint = Color(0xFFFFFFFF), // Цвет иконки
+                        modifier = Modifier.size(39.dp) // Увеличение размера иконки (при желании)
+                    )
                 }
-                IconButton(
-                    onClick = { /*todo*/ },
+            }
+            IconButton(
+                onClick = { navController.navigate("ordering_on_haircut_screen") },
+                modifier = Modifier
+                    .size(64.dp) // Увеличение размера кнопки
+                    .background(
+                        color = Color(0xFF99D77D),
+                        shape = RoundedCornerShape(10.dp) // Закругление углов
+                    )
+            ) {
+                Box(
+                    contentAlignment = Alignment.Center,
                     modifier = Modifier
-                        .size(64.dp) // Увеличение размера кнопки
-                        .background(
-                            color = Color(0xFF99D77D).copy(alpha = 0.5f),
-                            shape = RoundedCornerShape(10.dp) // Закругление углов
-                        )
+                        .size(64.dp)
                 ) {
-                    Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier
-                            .size(64.dp)
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.add),
-                            contentDescription = "Go to Main",
-                            tint = Color(0xFFFFFFFF), // Цвет иконки
-                            modifier = Modifier.size(39.dp) // Увеличение размера иконки (при желании)
-                        )
-                    }
+                    Icon(
+                        painter = painterResource(id = R.drawable.add),
+                        contentDescription = "Go to Main",
+                        tint = Color(0xFFFFFFFF), // Цвет иконки
+                        modifier = Modifier.size(39.dp) // Увеличение размера иконки (при желании)
+                    )
                 }
-                IconButton(
-                    onClick = { /*todo*/ },
+            }
+            IconButton(
+                onClick = { navController.navigate("user_profile_screen") },
+                modifier = Modifier
+                    .size(64.dp) // Увеличение размера кнопки
+                    .background(
+                        color = Color(0xFF99D77D),
+                        shape = RoundedCornerShape(10.dp) // Закругление углов
+                    )
+            ) {
+                Box(
+                    contentAlignment = Alignment.Center,
                     modifier = Modifier
-                        .size(64.dp) // Увеличение размера кнопки
-                        .background(
-                            color = Color(0xFF99D77D).copy(alpha = 0.5f),
-                            shape = RoundedCornerShape(10.dp) // Закругление углов
-                        )
+                        .size(64.dp)
                 ) {
-                    Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier
-                            .size(64.dp)
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.userprofile),
-                            contentDescription = "Go to Main",
-                            tint = Color(0xFFFFFFFF), // Цвет иконки
-                            modifier = Modifier.size(39.dp) // Увеличение размера иконки (при желании)
-                        )
-                    }
+                    Icon(
+                        painter = painterResource(id = R.drawable.userprofile),
+                        contentDescription = "Go to Main",
+                        tint = Color(0xFFFFFFFF), // Цвет иконки
+                        modifier = Modifier.size(39.dp) // Увеличение размера иконки (при желании)
+                    )
                 }
             }
         }
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable

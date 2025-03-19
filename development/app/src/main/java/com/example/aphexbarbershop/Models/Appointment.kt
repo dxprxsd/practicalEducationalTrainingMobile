@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 @SerialName("appointments")
 data class Appointment(
-    @SerialName("id") val id: Int,
+    @SerialName("id") val id: Int? = 0,
     @SerialName("client_id") val clientId: Int, // Клиент
     @SerialName("employee_id") val employeeId: Int?, // Сотрудник
     @SerialName("haircut_id") val haircutId: Int?, // Стрижка
