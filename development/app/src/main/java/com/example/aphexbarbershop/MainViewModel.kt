@@ -447,23 +447,57 @@ class MainViewModel : ViewModel() {
     val customOrders: State<List<Appointment>> = _customOrders
 
 
-    //Функция для получения данных заказах пользователя кастомных вещей
-    fun selectInfoAboutUserAppointments(){
+//    //Функция для получения данных заказах пользователя кастомных вещей
+//    fun selectInfoAboutUserAppointments(){
+//        viewModelScope.launch {
+//            try {
+//                // Получаем текущий UID пользователя
+//                val userUid = Constants.supabase.auth.currentUserOrNull()?.id
+//
+//                if(userUid != null) {
+//
+//                    // Получаем пользователя по UID из таблицы "users"
+//                    val userResponse = Constants.supabase.from("client").select {
+//                        filter {
+//                            Client::uid eq userUid // Сравниваем с userUid
+//                        }
+//                    }.decodeList<Client>()
+//
+//                    val userIdFromDb = userResponse.lastOrNull()?.id // Получаем ID пользователя из ответа базы данных
+//
+//                    _customOrders.value = Constants.supabase.from("appointments").select {
+//                        filter {
+//                            Appointment::clientId eq userIdFromDb
+//                        }
+//                    }.decodeList<Appointment>()
+//
+//                    Log.d("my_tag", "Success select info about custom orders")
+//                } else {
+//                    Log.d("my_tag", "Ошибка: currentUserUid не задан.")
+//                }
+//
+//            } catch (e: Exception) {
+//                Log.d("my_tag", e.message!!)
+//            }
+//        }
+//    }
+
+    private val _haircuts = MutableStateFlow<Map<Int, String>>(emptyMap()) // Map<id, name>
+    val haircutsss: StateFlow<Map<Int, String>> = _haircuts
+
+    fun selectInfoAboutUserAppointments() {
         viewModelScope.launch {
             try {
-                // Получаем текущий UID пользователя
                 val userUid = Constants.supabase.auth.currentUserOrNull()?.id
 
-                if(userUid != null) {
-
-                    // Получаем пользователя по UID из таблицы "users"
+                if (userUid != null) {
                     val userResponse = Constants.supabase.from("client").select {
                         filter {
-                            Client::uid eq userUid // Сравниваем с userUid
+                            Client::uid eq userUid
                         }
                     }.decodeList<Client>()
 
-                    val userIdFromDb = userResponse.lastOrNull()?.id // Получаем ID пользователя из ответа базы данных
+                    val userIdFromDb = userResponse.lastOrNull()?.id
 
                     _customOrders.value = Constants.supabase.from("appointments").select {
                         filter {
@@ -471,16 +505,37 @@ class MainViewModel : ViewModel() {
                         }
                     }.decodeList<Appointment>()
 
-                    Log.d("my_tag", "Success select info about custom orders")
+                    // Загружаем список стрижек
+                    val haircutsList = Constants.supabase.from("haircuts").select().decodeList<Haircut>()
+                    _haircuts.value = haircutsList.associateBy({ it.id }, { it.name }) // Преобразуем в Map<id, name>
+
+                    Log.d("my_tag", "Успешно загружены заказы и стрижки")
                 } else {
                     Log.d("my_tag", "Ошибка: currentUserUid не задан.")
                 }
-
             } catch (e: Exception) {
-                Log.d("my_tag", e.message!!)
+                Log.d("my_tag", e.message ?: "Ошибка загрузки данных")
             }
         }
     }
+
+    //Функция для удаления данных
+    fun deleteAppointmentFunction(id: Int) {
+        viewModelScope.launch {
+            try {
+                Constants.supabase.from("appointments").delete {
+                    filter {
+                        Appointment::id eq id
+                    }
+                }
+                Log.d("my_tag", "Success DELETE data")
+                selectInfoAboutUserAppointments() // Перезагружаем список после удаления
+            } catch (e: Exception) {
+                Log.d("my_tag", e.message ?: "Ошибка при удалении")
+            }
+        }
+    }
+
 
 }
 

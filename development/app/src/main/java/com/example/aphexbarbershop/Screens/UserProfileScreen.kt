@@ -90,35 +90,10 @@ fun UserProfileScreen(navController: NavHostController, viewModel: MainViewModel
         val isMiddleNameEnabled = remember { mutableStateOf(false) }
         //val isDateOfBirthEnabled = remember { mutableStateOf(false) }
 
-        // Слой градиента 1
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(
-                    brush = Brush.verticalGradient(
-                        colors = listOf(
-                            Color(0xFFFFFFFF).copy(alpha = 0.8f),
-                            Color(0xFF000000).copy(alpha = 0.9f)
-                        ),
-                        startY = 0.0f,
-                        endY = 1500.0f
-                    )
-                )
-        )
-        // Слой градиента 2
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    brush = Brush.linearGradient(
-                        colors = listOf(
-                            Color(0xFF99D77D).copy(alpha = 0.8f),
-                            Color(0xFFFFFFFF).copy(alpha = 0.8f)
-                        ),
-                        start = Offset(0f, 0f),
-                        end = Offset(Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY)
-                    )
-                )
+                .background(Color(0xFF565656)) // Темный фон
         ) {
             Column(
                 modifier = Modifier
@@ -131,333 +106,352 @@ fun UserProfileScreen(navController: NavHostController, viewModel: MainViewModel
                 verticalArrangement = Arrangement.Top
             ) {
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    IconButton(onClick = { navController.navigate("main_screen") }) {
-                        Image(
-                            painter = painterResource(id = R.drawable.backbutton),
-                            contentDescription = "Back Button",
-                            modifier = Modifier.size(40.dp)
-                        )
-                    }
-                    Spacer(modifier = Modifier.weight(1f))
-                    Image(
-                        painter = painterResource(id = R.drawable.logomini),
-                        contentDescription = "Center Logo",
-                        modifier = Modifier.size(50.dp)
-                    )
-                }
-                Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Top
+                        .padding(10.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Отображение полей профиля
+                    Text(
+                        text = "Профиль", // Просто текст
+                        fontSize = 28.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
+
+                    Image(
+                        painter = painterResource(id = R.drawable.logomini),
+                        contentDescription = "Right Logo",
+                        modifier = Modifier.size(70.dp)
+                    )
+                }
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(
+                            Color(0xFFE8E8E8),
+                            RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp)
+                        )
+                        .padding(24.dp)
+                ) {
+
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                            .padding(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Top
                     ) {
-                        // Фамилия
-                        Row(
+                        // Отображение полей профиля
+                        Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(vertical = 8.dp),
-                            verticalAlignment = Alignment.CenterVertically
+                                .padding(vertical = 16.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            Box(
+                            // Фамилия
+                            Row(
                                 modifier = Modifier
-                                    .weight(1f)
-                                    .width(75.dp)
-                                    .height(50.dp)
-                                    .background(
-                                        color = Color(0xFFD9D9D9),
-                                        RoundedCornerShape(10.dp)
-                                    )
-                                    .padding(16.dp),
-                                contentAlignment = Alignment.Center
+                                    .fillMaxWidth()
+                                    .padding(vertical = 8.dp),
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Text(text = second_name.value, color = Color.Black)
-                            }
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Box(
-                                modifier = Modifier
-                                    .size(50.dp)
-                                    .background(
-                                        color = Color(0xFF99D77D),
-                                        RoundedCornerShape(10.dp)
-                                    )
-                                    .padding(16.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(
+                                Box(
                                     modifier = Modifier
-                                        .size(25.dp)
-                                        .clickable {
-                                            isLastNameEnabled.value = !isLastNameEnabled.value
+                                        .weight(1f)
+                                        .width(75.dp)
+                                        .height(50.dp)
+                                        .background(
+                                            color = Color.White,
+                                            RoundedCornerShape(10.dp)
+                                        )
+                                        .padding(16.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(text = second_name.value, color = Color.Black)
+                                }
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Box(
+                                    modifier = Modifier
+                                        .size(50.dp)
+                                        .background(
+                                            color = Color(0xFF99D77D),
+                                            RoundedCornerShape(10.dp)
+                                        )
+                                        .padding(16.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        modifier = Modifier
+                                            .size(25.dp)
+                                            .clickable {
+                                                isLastNameEnabled.value = !isLastNameEnabled.value
+                                            },
+                                        painter = painterResource(id = R.drawable.edit),
+                                        contentDescription = "Edit Last Name",
+                                        tint = Color.White
+                                    )
+                                }
+                            }
+                            AnimatedVisibility(
+                                visible = isLastNameEnabled.value,
+                                Modifier.padding(8.dp)
+                            ) {
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    OutlinedTextField(
+                                        value = second_name.value,
+                                        onValueChange = { second_name.value = it },
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .background(
+                                                color = Color.White,
+                                                RoundedCornerShape(10.dp)
+                                            ),
+                                        label = { Text("Введите фамилию", color = Color.Black) },
+                                        textStyle = LocalTextStyle.current.copy(
+                                            fontSize = 16.sp,
+                                            color = Color.Black
+                                        )
+                                    )
+                                    Button(
+                                        onClick = {
+                                            viewModel.updateLastNameUserProfile(second_name.value)
+                                            isLastNameEnabled.value =
+                                                false // Скрываем поле после сохранения
                                         },
-                                    painter = painterResource(id = R.drawable.edit),
-                                    contentDescription = "Edit Last Name",
-                                    tint = Color.White
-                                )
-                            }
-                        }
-                        AnimatedVisibility(
-                            visible = isLastNameEnabled.value,
-                            Modifier.padding(8.dp)
-                        ) {
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                OutlinedTextField(
-                                    value = second_name.value,
-                                    onValueChange = { second_name.value = it },
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .background(
-                                            Color(0xFFD9D9D9),
-                                            RoundedCornerShape(10.dp)
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(top = 8.dp),
+                                        colors = ButtonDefaults.buttonColors(
+                                            containerColor = Color(
+                                                0xFF99D77D
+                                            )
                                         ),
-                                    label = { Text("Введите фамилию", color = Color.Black) },
-                                    textStyle = LocalTextStyle.current.copy(
-                                        fontSize = 16.sp,
-                                        color = Color.Black
-                                    )
-                                )
-                                Button(
-                                    onClick = {
-                                        viewModel.updateLastNameUserProfile(second_name.value)
-                                        isLastNameEnabled.value =
-                                            false // Скрываем поле после сохранения
-                                    },
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(top = 8.dp),
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = Color(
-                                            0xFF99D77D
-                                        )
-                                    ),
-                                    shape = RoundedCornerShape(10.dp)
-                                ) {
-                                    Text("Сохранить", color = Color.White, fontSize = 16.sp)
+                                        shape = RoundedCornerShape(10.dp)
+                                    ) {
+                                        Text("Сохранить", color = Color.White, fontSize = 16.sp)
+                                    }
                                 }
                             }
-                        }
 
-                        // Имя
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 8.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Box(
+                            // Имя
+                            Row(
                                 modifier = Modifier
-                                    .weight(1f)
-                                    .width(75.dp)
-                                    .height(50.dp)
-                                    .background(
-                                        color = Color(0xFFD9D9D9),
-                                        RoundedCornerShape(10.dp)
-                                    )
-                                    .padding(16.dp),
-                                contentAlignment = Alignment.Center
+                                    .fillMaxWidth()
+                                    .padding(vertical = 8.dp),
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Text(text = name.value, color = Color.Black)
-                            }
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Box(
-                                modifier = Modifier
-                                    .size(50.dp)
-                                    .background(
-                                        color = Color(0xFF99D77D),
-                                        RoundedCornerShape(10.dp)
-                                    )
-                                    .padding(16.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.edit),
-                                    contentDescription = "Edit First Name",
-                                    tint = Color.White,
+                                Box(
                                     modifier = Modifier
-                                        .size(25.dp)
-                                        .clickable {
-                                            isNameEnabled.value = !isNameEnabled.value
-                                        }
-                                )
-                            }
-                        }
-                        AnimatedVisibility(
-                            visible = isNameEnabled.value,
-                            Modifier.padding(8.dp)
-                        ) {
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                OutlinedTextField(
-                                    value = name.value,
-                                    onValueChange = { name.value = it },
-                                    modifier = Modifier
-                                        .fillMaxWidth()
+                                        .weight(1f)
+                                        .width(75.dp)
+                                        .height(50.dp)
                                         .background(
-                                            Color(0xFFD9D9D9),
+                                            color = Color.White,
                                             RoundedCornerShape(10.dp)
-                                        ),
-                                    label = { Text("Введите имя", color = Color.Black) },
-                                    textStyle = LocalTextStyle.current.copy(
-                                        fontSize = 16.sp,
-                                        color = Color.Black
-                                    )
-                                )
-                                Button(
-                                    onClick = {
-                                        viewModel.updateNameUserProfile(name.value)
-                                        isNameEnabled.value =
-                                            false // Скрываем поле после сохранения
-                                    },
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(top = 8.dp),
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = Color(
-                                            0xFF99D77D
                                         )
-                                    ),
-                                    shape = RoundedCornerShape(10.dp)
+                                        .padding(16.dp),
+                                    contentAlignment = Alignment.Center
                                 ) {
-                                    Text("Сохранить", color = Color.White, fontSize = 16.sp)
+                                    Text(text = name.value, color = Color.Black)
+                                }
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Box(
+                                    modifier = Modifier
+                                        .size(50.dp)
+                                        .background(
+                                            color = Color(0xFF99D77D),
+                                            RoundedCornerShape(10.dp)
+                                        )
+                                        .padding(16.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.edit),
+                                        contentDescription = "Edit First Name",
+                                        tint = Color.White,
+                                        modifier = Modifier
+                                            .size(25.dp)
+                                            .clickable {
+                                                isNameEnabled.value = !isNameEnabled.value
+                                            }
+                                    )
                                 }
                             }
-                        }
-
-                        // Отчество
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 8.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .width(75.dp)
-                                    .height(50.dp)
-                                    .background(
-                                        color = Color(0xFFD9D9D9),
-                                        RoundedCornerShape(10.dp)
-                                    )
-                                    .padding(16.dp),
-                                contentAlignment = Alignment.Center
+                            AnimatedVisibility(
+                                visible = isNameEnabled.value,
+                                Modifier.padding(8.dp)
                             ) {
-                                Text(text = patronymic.value ?: "", color = Color.Black)
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    OutlinedTextField(
+                                        value = name.value,
+                                        onValueChange = { name.value = it },
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .background(
+                                                Color(0xFFD9D9D9),
+                                                RoundedCornerShape(10.dp)
+                                            ),
+                                        label = { Text("Введите имя", color = Color.Black) },
+                                        textStyle = LocalTextStyle.current.copy(
+                                            fontSize = 16.sp,
+                                            color = Color.Black
+                                        )
+                                    )
+                                    Button(
+                                        onClick = {
+                                            viewModel.updateNameUserProfile(name.value)
+                                            isNameEnabled.value =
+                                                false // Скрываем поле после сохранения
+                                        },
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(top = 8.dp),
+                                        colors = ButtonDefaults.buttonColors(
+                                            containerColor = Color(
+                                                0xFF99D77D
+                                            )
+                                        ),
+                                        shape = RoundedCornerShape(10.dp)
+                                    ) {
+                                        Text("Сохранить", color = Color.White, fontSize = 16.sp)
+                                    }
+                                }
                             }
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Box(
+
+                            // Отчество
+                            Row(
                                 modifier = Modifier
-                                    .size(50.dp)
-                                    .background(
-                                        color = Color(0xFF99D77D),
-                                        RoundedCornerShape(10.dp)
-                                    )
-                                    .padding(16.dp),
-                                contentAlignment = Alignment.Center
+                                    .fillMaxWidth()
+                                    .padding(vertical = 8.dp),
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Icon(
+                                Box(
                                     modifier = Modifier
-                                        .size(25.dp)
-                                        .clickable {
+                                        .weight(1f)
+                                        .width(75.dp)
+                                        .height(50.dp)
+                                        .background(
+                                            color = Color.White,
+                                            RoundedCornerShape(10.dp)
+                                        )
+                                        .padding(16.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(text = patronymic.value ?: "", color = Color.Black)
+                                }
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Box(
+                                    modifier = Modifier
+                                        .size(50.dp)
+                                        .background(
+                                            color = Color(0xFF99D77D),
+                                            RoundedCornerShape(10.dp)
+                                        )
+                                        .padding(16.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        modifier = Modifier
+                                            .size(25.dp)
+                                            .clickable {
+                                                isMiddleNameEnabled.value =
+                                                    !isMiddleNameEnabled.value
+                                            },
+                                        painter = painterResource(id = R.drawable.edit),
+                                        contentDescription = "Edit Middle Name",
+                                        tint = Color.White
+                                    )
+                                }
+                            }
+                            AnimatedVisibility(
+                                visible = isMiddleNameEnabled.value,
+                                Modifier.padding(8.dp)
+                            ) {
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    OutlinedTextField(
+                                        value = patronymic.value,
+                                        onValueChange = { patronymic.value = it },
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .background(
+                                                Color(0xFFD9D9D9),
+                                                RoundedCornerShape(10.dp)
+                                            ),
+                                        label = { Text("Введите отчество", color = Color.Black) },
+                                        textStyle = LocalTextStyle.current.copy(
+                                            fontSize = 16.sp,
+                                            color = Color.Black
+                                        )
+                                    )
+                                    Button(
+                                        onClick = {
+                                            viewModel.updateMiddleNameUserProfile(patronymic.value)
                                             isMiddleNameEnabled.value =
-                                                !isMiddleNameEnabled.value
+                                                false // Скрываем поле после сохранения
                                         },
-                                    painter = painterResource(id = R.drawable.edit),
-                                    contentDescription = "Edit Middle Name",
-                                    tint = Color.White
-                                )
-                            }
-                        }
-                        AnimatedVisibility(
-                            visible = isMiddleNameEnabled.value,
-                            Modifier.padding(8.dp)
-                        ) {
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                OutlinedTextField(
-                                    value = patronymic.value,
-                                    onValueChange = { patronymic.value = it },
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .background(
-                                            Color(0xFFD9D9D9),
-                                            RoundedCornerShape(10.dp)
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(top = 8.dp),
+                                        colors = ButtonDefaults.buttonColors(
+                                            containerColor = Color(
+                                                0xFF99D77D
+                                            )
                                         ),
-                                    label = { Text("Введите отчество", color = Color.Black) },
-                                    textStyle = LocalTextStyle.current.copy(
-                                        fontSize = 16.sp,
-                                        color = Color.Black
-                                    )
-                                )
-                                Button(
-                                    onClick = {
-                                        viewModel.updateMiddleNameUserProfile(patronymic.value)
-                                        isMiddleNameEnabled.value =
-                                            false // Скрываем поле после сохранения
-                                    },
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(top = 8.dp),
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = Color(
-                                            0xFF99D77D
-                                        )
-                                    ),
-                                    shape = RoundedCornerShape(10.dp)
-                                ) {
-                                    Text("Сохранить", color = Color.White, fontSize = 16.sp)
+                                        shape = RoundedCornerShape(10.dp)
+                                    ) {
+                                        Text("Сохранить", color = Color.White, fontSize = 16.sp)
+                                    }
                                 }
                             }
-                        }
 
-                        // Количество посещений
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 8.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Box(
+                            // Количество посещений
+                            Row(
                                 modifier = Modifier
-                                    .weight(1f)
-                                    .width(75.dp)
-                                    .height(50.dp)
-                                    .background(
-                                        color = Color(0xFFD9D9D9),
-                                        RoundedCornerShape(10.dp)
-                                    )
-                                    .padding(16.dp),
-                                contentAlignment = Alignment.Center
+                                    .fillMaxWidth()
+                                    .padding(vertical = 8.dp),
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Text(text = visit_count.value.toString(), color = Color.Black)
+                                Text(text = "Количество посещений:", color = Color.Black)
+                                Spacer(modifier = Modifier.width(16.dp))
+                                Box(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .width(75.dp)
+                                        .height(50.dp)
+                                        .background(
+                                            color = Color.White,
+                                            RoundedCornerShape(10.dp)
+                                        )
+                                        .padding(16.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(text = visit_count.value.toString(), color = Color.Black)
+                                }
                             }
-                        }
 
-                        // Кнопка "Продолжить"
-                        Button(
-                            onClick = {
-                                navController.navigate("appointment_list_screen")
-                            },
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF98E58C)), // Зеленый цвет кнопки
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(48.dp),
-                            shape = RoundedCornerShape(12.dp)
-                        ) {
-                            Text(
-                                text = "Посмотреть историю заказов",
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.White
-                            )
+                            // Кнопка посмотреть историю заказов
+                            Button(
+                                onClick = {
+                                    navController.navigate("appointment_list_screen")
+                                },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color(
+                                        0xFF98E58C
+                                    )
+                                ), // Зеленый цвет кнопки
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(48.dp),
+                                shape = RoundedCornerShape(12.dp)
+                            ) {
+                                Text(
+                                    text = "Посмотреть историю заказов",
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.White
+                                )
+                            }
                         }
                     }
                 }

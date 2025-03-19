@@ -3,6 +3,7 @@ package com.example.aphexbarbershop.Screens
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,12 +25,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -115,7 +118,6 @@ fun MainScreen(navController: NavHostController, viewModel: MainViewModel) {
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
-
             // Поисковое поле
             TextField(
                 value = viewModel.searchQuery.value,
@@ -132,8 +134,10 @@ fun MainScreen(navController: NavHostController, viewModel: MainViewModel) {
                 colors = TextFieldDefaults.outlinedTextFieldColors(
                     unfocusedBorderColor = Color(0xFF99D77D), // Границы цвета 99D77D
                     focusedBorderColor = Color(0xFF99D77D)
-                )
+                ),
+                textStyle = LocalTextStyle.current.copy(color = Color.Black) // Цвет текста черный
             )
+
 
             Spacer(modifier = Modifier.width(10.dp))
 
@@ -244,58 +248,66 @@ fun MainScreen(navController: NavHostController, viewModel: MainViewModel) {
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     items(filteredHaircutss, key = { it.id }) { haircut ->
-                        Card(
+                        Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(240.dp),
-                            shape = RoundedCornerShape(12.dp),
+                                .height(240.dp)
+                                .border(2.dp, Color(0xFF99D77D), RoundedCornerShape(12.dp)) // Граница карточки
                         ) {
-                            Column(
-                                modifier = Modifier.padding(8.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally
+                            Card(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(240.dp),
+                                shape = RoundedCornerShape(12.dp),
+                                colors = CardDefaults.cardColors(containerColor = Color.White) // Белый фон карточки
                             ) {
-                                val photoUrl = rememberAsyncImagePainter(
-                                    model = ImageRequest.Builder(LocalContext.current)
-                                        .data(haircut.photo)
-                                        .size(450, 450).build()
-                                ).state
-
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(160.dp)
-                                        .border(
-                                            2.dp,
-                                            Color(0xFF98E58C),
-                                            RoundedCornerShape(8.dp)
-                                        ) // Обводка
-                                        .padding(4.dp), // Отступ между границей и изображением
-                                    contentAlignment = Alignment.Center // Центрируем изображение
+                                Column(
+                                    modifier = Modifier.padding(8.dp),
+                                    horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
-                                    if (photoUrl is AsyncImagePainter.State.Success) {
-                                        Image(
-                                            painter = photoUrl.painter!!,
-                                            contentDescription = null,
-                                            modifier = Modifier
-                                                .fillMaxSize() // Уменьшаем высоту, чтобы учесть обводку
-                                                .clip(RoundedCornerShape(8.dp)), // Закругляем углы
-                                            contentScale = ContentScale.Crop // Обрезает изображение, чтобы оно вписывалось
-                                        )
-                                    } else if (photoUrl is AsyncImagePainter.State.Loading) {
-                                        CircularProgressIndicator(modifier = Modifier.size(40.dp))
-                                    } else {
-                                        Image(
-                                            painter = painterResource(R.drawable.aphexlogobarber),
-                                            contentDescription = "Fallback Image",
-                                            modifier = Modifier.size(50.dp)
-                                        )
-                                    }
-                                }
+                                    val photoUrl = rememberAsyncImagePainter(
+                                        model = ImageRequest.Builder(LocalContext.current)
+                                            .data(haircut.photo)
+                                            .size(450, 450).build()
+                                    ).state
 
-                                Spacer(modifier = Modifier.height(8.dp))
-                                Text(text = haircut.name, fontWeight = FontWeight.Bold)
-                                Spacer(modifier = Modifier.height(4.dp))
-                                Text(text = "${haircut.price} ₽", fontWeight = FontWeight.Bold)
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(160.dp)
+                                            .border(
+                                                2.dp,
+                                                Color(0xFF99D77D),
+                                                RoundedCornerShape(8.dp)
+                                            ) // Обводка
+                                            .padding(4.dp), // Отступ между границей и изображением
+                                        contentAlignment = Alignment.Center // Центрируем изображение
+                                    ) {
+                                        if (photoUrl is AsyncImagePainter.State.Success) {
+                                            Image(
+                                                painter = photoUrl.painter!!,
+                                                contentDescription = null,
+                                                modifier = Modifier
+                                                    .fillMaxSize() // Уменьшаем высоту, чтобы учесть обводку
+                                                    .clip(RoundedCornerShape(8.dp)), // Закругляем углы
+                                                contentScale = ContentScale.Crop // Обрезает изображение, чтобы оно вписывалось
+                                            )
+                                        } else if (photoUrl is AsyncImagePainter.State.Loading) {
+                                            CircularProgressIndicator(modifier = Modifier.size(40.dp))
+                                        } else {
+                                            Image(
+                                                painter = painterResource(R.drawable.aphexlogobarber),
+                                                contentDescription = "Fallback Image",
+                                                modifier = Modifier.size(50.dp)
+                                            )
+                                        }
+                                    }
+
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                    Text(text = haircut.name, fontWeight = FontWeight.Bold)
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Text(text = "${haircut.price} ₽", fontWeight = FontWeight.Bold)
+                                }
                             }
                         }
                     }
