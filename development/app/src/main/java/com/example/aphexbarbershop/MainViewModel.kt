@@ -307,7 +307,7 @@ class MainViewModel : ViewModel() {
     fun selectCurrentUserProfile() {
         viewModelScope.launch {
             try {
-                _user.value = Constants.supabase.from("client").select {
+                _userrc.value = Constants.supabase.from("client").select {
                     filter {
                         Client::uid eq Constants.supabase.auth.currentUserOrNull()!!.id
                     }
@@ -386,7 +386,7 @@ class MainViewModel : ViewModel() {
 
                 Constants.supabase.from("client").update(
                     {
-                        Client::name setTo fname
+                        set("name_client", value)
                     }
                 ) {
                     filter {
@@ -404,10 +404,9 @@ class MainViewModel : ViewModel() {
     fun updateLastNameUserProfile(value: String) {
         viewModelScope.launch {
             try {
-
                 Constants.supabase.from("client").update(
                     {
-                        Client::surname setTo sname
+                        set("surname_client", value)
                     }
                 ) {
                     filter {
@@ -426,9 +425,9 @@ class MainViewModel : ViewModel() {
         viewModelScope.launch {
             try {
 
-                Constants.supabase.from("users").update(
+                Constants.supabase.from("client").update(
                     {
-                        Client::patronymic setTo mname
+                        set("patronymic_client", value)
                     }
                 ) {
                     filter {
@@ -436,6 +435,46 @@ class MainViewModel : ViewModel() {
                     }
                 }
                 Log.d("my_tag", "Success update profile")
+
+            } catch (e: Exception) {
+                Log.d("my_tag", e.message!!)
+            }
+        }
+    }
+
+    //для выведения заказов кастома
+    private val _customOrders = mutableStateOf(listOf<Appointment>())
+    val customOrders: State<List<Appointment>> = _customOrders
+
+
+    //Функция для получения данных заказах пользователя кастомных вещей
+    fun selectInfoAboutUserAppointments(){
+        viewModelScope.launch {
+            try {
+                // Получаем текущий UID пользователя
+                val userUid = Constants.supabase.auth.currentUserOrNull()?.id
+
+                if(userUid != null) {
+
+                    // Получаем пользователя по UID из таблицы "users"
+                    val userResponse = Constants.supabase.from("client").select {
+                        filter {
+                            Client::uid eq userUid // Сравниваем с userUid
+                        }
+                    }.decodeList<Client>()
+
+                    val userIdFromDb = userResponse.lastOrNull()?.id // Получаем ID пользователя из ответа базы данных
+
+                    _customOrders.value = Constants.supabase.from("appointments").select {
+                        filter {
+                            Appointment::clientId eq userIdFromDb
+                        }
+                    }.decodeList<Appointment>()
+
+                    Log.d("my_tag", "Success select info about custom orders")
+                } else {
+                    Log.d("my_tag", "Ошибка: currentUserUid не задан.")
+                }
 
             } catch (e: Exception) {
                 Log.d("my_tag", e.message!!)

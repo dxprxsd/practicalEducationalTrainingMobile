@@ -7,6 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.aphexbarbershop.Screens.AppointmentListScreen
 import com.example.aphexbarbershop.Screens.LoadScreen
 import com.example.aphexbarbershop.Screens.LoginScreen
 import com.example.aphexbarbershop.Screens.MainScreen
@@ -49,6 +50,9 @@ class MainActivity : ComponentActivity() {
                     }
                     composable("user_profile_screen") {
                         UserProfileScreen(navController = navController, viewModel = viewModel)
+                    }
+                    composable("appointment_list_screen") {
+                        AppointmentListScreen(navController = navController, viewModel = viewModel)
                     }
                 }
             }

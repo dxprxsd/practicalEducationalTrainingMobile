@@ -394,8 +394,7 @@ fun OrderingOnHaircutScreen(navController: NavHostController, viewModel: MainVie
             modifier = Modifier
                 .fillMaxWidth()
                 .background(
-                    color = Color.White,
-                    shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
+                    color = Color.White
                 )
                 .padding(16.dp)
                 .align(Alignment.BottomCenter),

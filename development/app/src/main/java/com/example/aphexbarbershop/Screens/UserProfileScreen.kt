@@ -46,6 +46,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -440,20 +441,23 @@ fun UserProfileScreen(navController: NavHostController, viewModel: MainViewModel
                             }
                         }
 
-                        //кнопка для перехода на страницу истории заказов
+                        // Кнопка "Продолжить"
                         Button(
-                            onClick = { navController.navigate("order_history_screen") },
+                            onClick = {
+                                navController.navigate("appointment_list_screen")
+                            },
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF98E58C)), // Зеленый цвет кнопки
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(top = 8.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(
-                                    0xFF99D77D
-                                )
-                            ),
-                            shape = RoundedCornerShape(10.dp)
+                                .height(48.dp),
+                            shape = RoundedCornerShape(12.dp)
                         ) {
-                            Text("Посмотреть историю заказов", color = Color.White, fontSize = 16.sp)
+                            Text(
+                                text = "Посмотреть историю заказов",
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White
+                            )
                         }
                     }
                 }
@@ -465,9 +469,9 @@ fun UserProfileScreen(navController: NavHostController, viewModel: MainViewModel
                     .fillMaxWidth()
                     .background(
                         color = Color.White,
-                        shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
                     )
-                    .padding(16.dp),
+                    .padding(16.dp)
+                    .align(Alignment.BottomCenter),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 IconButton(
